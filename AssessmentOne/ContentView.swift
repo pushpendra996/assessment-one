@@ -10,7 +10,7 @@ import SwiftUI
 struct ContentView: View {
     @State private var input: String = ""
     @State private var result: String = ""
-    @State private var isValid: Bool?
+    @State private var isValid: Bool = false
 
     var body: some View {
         VStack(spacing: 20) {
@@ -25,6 +25,7 @@ struct ContentView: View {
                 .autocapitalization(.none)
 
             Button(action: {
+                self.isValid = isValid(input)
                 result = isValid == true ? "✅ Valid" : "❌ Invalid"
             }) {
                 Text("Validate")
@@ -47,6 +48,28 @@ struct ContentView: View {
         }
         .padding()
     }
+    
+    private func isValid(_ input : String) -> Bool {
+        if input.isEmpty {
+            return false
+        }
+        let matching : [Character : Character] = [")" : "(", "]" : "[", "}": "{"]
+        var stack : [Character] = []
+        
+        for char in input {
+            if char == "(" || char == "[" || char == "{" {
+                stack.append(char)
+            } else if let match = matching[char] {
+                if stack.isEmpty || stack.removeLast() != match {
+                    return false
+                }
+            } else {
+                return false
+            }
+        }
+        return stack.isEmpty
+    }
+
 }
 
 
